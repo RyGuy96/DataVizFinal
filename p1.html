@@ -10,34 +10,52 @@
             margin: 20px;
         }
         
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
         .content {
             border: 1px solid #ccc;
             padding: 20px;
             min-height: 300px;
+            flex: 1;
+        }
+        
+        .nav-arrow {
+            font-size: 24px;
+            text-decoration: none;
+            color: #333;
+            padding: 10px;
+        }
+        
+        .nav-arrow:hover {
+            color: #007bff;
         }
         
         .navigation {
             margin: 20px 0;
+            text-align: center;
         }
         
         .navigation a {
-            margin-right: 10px;
+            margin: 0 10px;
         }
     </style>
 </head>
 <body>
     <h1>Data Visualizations</h1>
     
-    <div class="content">
-        <h2>Page 1</h2>
-        <p>Content for page goes here.</p>
-    </div>
-    
-    <div class="navigation">
-        <span>
-            <a href="https://ryguy96.github.io/DataVizFinal">Back</a>
-            <a href="https://ryguy96.github.io/DataVizFinal/p2">Next</a>
-         </span>
+    <div class="container">
+        <a href="https://ryguy96.github.io/DataVizFinal/p2" class="nav-arrow">‹</a>
+        
+        <div class="content">
+            <h2>Page 1</h2>
+            <p>Content for page goes here.</p>
+        </div>
+        
+        <a href="https://ryguy96.github.io/DataVizFinal" class="nav-arrow">›</a>
     </div>
 </body>
 </html>
