@@ -1,70 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <title>Financial Anxieties</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Visualizations</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        
-        .container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .content {
-            border: 1px solid #ccc;
-            padding: 20px;
-            min-height: 300px;
-            flex: 1;
-        }
-        
-        .nav-arrow {
-            font-size: 24px;
-            text-decoration: none;
-            color: #333;
-            padding: 10px;
-        }
-        
-        .nav-arrow:hover {
-            color: #007bff;
-        }
-        
-        .navigation {
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .navigation a {
-            margin: 0 10px;
-        }
+    .container {
+     display: flex;
+        align-items:center;
+         max-width: 100%;
+    }
     </style>
 </head>
 <body>
-    <h1>Data Visualizations</h1>
-    
-    <div class="container">
-        <a href="https://ryguy96.github.io/DataVizFinal" class="nav-arrow">‹</a>
-        
-        <div class="content">
-            <h2>Page 1</h2>
-            <p>
-                <script>
-                d3.csv("DatabankWide.csv").then(function(data) {
-                    console.log(data);
-                });
-                </script>
-            </p>
+<div style="margin-left: 50px;">
+<h2>Financial Anxieties</h2>
+<h3>Survey Responses Around The World: <i>What Is Your Most Worrying Financial Issue?</i></h3>
+</div>
+
+<div class="container">
+    <a href="https://ryguy96.github.io/DataVizFinal" class="nav-arrow">‹</a>
+    <div class="content">
+        <div class="controls">
+            Group By:
+            <input type="radio" name="view" value="income" checked> Income Group
+            <input type="radio" name="view" value="region"> Region
+            <input type="radio" name="view" value="country"> Country
         </div>
-        
-        <a href="https://ryguy96.github.io/DataVizFinal/p2" class="nav-arrow">›</a>
+        <div id="chart"></div>
+        <div class="tooltip" id="tooltip" style="opacity: 0;"></div>
     </div>
+    <a href="https://ryguy96.github.io/DataVizFinal/p2" class="nav-arrow">›</a>
+</div>
+
+<script>
+let regonData = [], incomeData = [], countryData = [], currentData = [];
+
+let currentView = "income" , sortBy = null;
+
+const margin = { top:50, right: 350, bottom: 150, left: 90 };
+const baseWidth = 800, height = 580;
+
+let temp= "temp";
+const svg = d3.select("#chart").append("svg");
+const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+const color = d3.scaleOrdinal()
+    .domain(["oldAge", "medical", "monthly", "education", "other"])
+    .range(["#8e44ad", "#e74c3c", "#f39c12", "#3498db", "#95a5a6"]);
+
+const x = d3.scaleBand().padding(0.1);
+const y = d3.scaleLinear().range([height, 0]).domain([0, 100]);
+
+const tooltip = d3.select("#tooltip");
+
+function processData(data, dataType) {
+    let cleaned = [];
+    for (var i = 0; i < data.length; i++) {
+        const d = data[i];
+        let name = dataType === "income" ? d["Income Group"] : d["Country name"];
+        if (!name) continue;
+        cleaned.push({
+            name: name,
+            oldAge: Math.round((+d["Old Age"] || 0) * 100),
+            medical: Math.round((+d["Medical Costs"] || 0) * 100),
+            monthly: Math.round((+d["Bills"] || 0) * 100),
+            education: Math.round((+d["Education Expenses"] || 0) * 100),
+            other: Math.round((+d["Other"] || 0) * 100)
+        });
+    }
+    return cleaned;
+}
+
+function updateCurrentData() {
+    if (currentView === "region") currentData = regonData.slice();
+    else if (currentView === "income") currentData = incomeData.slice();
+    else currentData = countryData.slice();
+
+    if (sortBy) {
+        currentData.sort(function (a, b) {
+            return b[sortBy] - a[sortBy];
+        });
+    }
+
+    console.log("Updating current data: " + currentData.length + " items");
+}
+
+function updateChart() {
+    if (!currentData.length) return;
+
+    let width = currentView === "country" ? baseWidth * 1.4 : baseWidth;
+
+    svg.attr("width", width + margin.left + margin.right)
+       .attr("height", height + margin.top + margin.bottom);
+
+    x.domain(currentData.map(function(d) { return d.name; }))
+     .range([0, width]);
+
+    g.selectAll("*").remove();
+
+    currentData.forEach(d => {
+        let s = 0;
+        d._stacked = [];
+        ["oldAge","medical","monthly","education","other"].forEach(function(k) {
+            d._stacked.push({ key: k, start: s, end: s + d[k], value: d[k] });
+            s += d[k];
+        });
+    });
+
+    let barGroups = g.selectAll(".bar-group")
+        .data(currentData)
+        .enter().append("g")
+        .attr("transform", d => "translate(" + x(d.name) + ",0)");
+
+    barGroups.selectAll("rect")
+        .data(d => d._stacked)
+        .enter().append("rect")
+        .attr("y", d => y(d.end))
+        .attr("height", d => y(d.start) - y(d.end))
+        .attr("width", x.bandwidth())
+        .attr("fill", d => color(d.key))
+        .on("mouseover", function(event, d) {
+            tooltip.style("opacity", 1)
+                   .html(d.key + ": " + d.value + "%")
+                   .style("left", (event.pageX + 8) + "px")
+                   .style("top", (event.pageY - 12) + "px");
+        })
+        .on("mouseout", function() { tooltip.style("opacity", 0); });
+
+    g.append("g")
+     .attr("transform", "translate(0," + height + ")")
+     .call(d3.axisBottom(x))
+     .selectAll("text")
+     .style("text-anchor", "end")
+     .attr("dx", "-.8em")
+     .attr("dy", ".15em")
+     .attr("transform", "rotate(-45)")
+     .style("font-size", currentView === "country" ? "10px" : "16px");
+
+    g.append("g")
+     .call(d3.axisLeft(y).tickFormat(d => d + "%"))
+     .style("font-size", "16px");
+
+    const legendKeys = ["oldAge", "medical", "monthly", "education", "other"];
+    const legend = g.append("g").attr("transform", "translate(" + (width + 20) + ",30)");
+
+    for (let i = 0; i < legendKeys.length; i++) {
+        const key = legendKeys[i];
+        const row = legend.append("g").attr("transform", "translate(0," + (i * 30) + ")");
+        row.append("rect").attr("width", 18).attr("height", 18).attr("fill", color(key));
+        row.append("text")
+           .attr("x", 25)
+           .attr("y", 14)
+           .text(getWorryLabel(key))
+           .style("font-weight", sortBy === key ? "bold" : "normal")
+           .style("font-size", "14px");
+    }
+
+    RenderAll();
+}
+
+function getWorryLabel(k) {
+    const m = {
+        oldAge: "Old Age ⓘ",
+        medical: "Medical Costs ⓘ",
+        monthly: "Bills ⓘ",
+        education: "Education ⓘ",
+        other: "Other ⓘ"
+    };
+    return m[k] || k;
+}
+
+Promise.all([
+    d3.json("WorryByRegion.json"),
+    d3.json("WorryByIncome.json"),
+    d3.json("WorryByCountry.json")
+]).then(function([r, i, c]) {
+    regonData = processData(r, "region");
+    incomeData = processData(i, "income");
+    countryData = processData(c, "country");
+
+    updateCurrentData();
+    updateChart();
+});
+
+d3.selectAll("input[name='view']").on("change", function () {
+    currentView = this.value;
+    sortBy = null;
+    updateCurrentData();
+    updateChart();
+});
+</script>
 </body>
 </html>

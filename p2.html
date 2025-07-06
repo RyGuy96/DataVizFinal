@@ -1,61 +1,236 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Visualizations</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        
-        .container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .content {
-            border: 1px solid #ccc;
-            padding: 20px;
-            min-height: 300px;
-            flex: 1;
-        }
-        
-        .nav-arrow {
-            font-size: 24px;
-            text-decoration: none;
-            color: #333;
-            padding: 10px;
-        }
-        
-        .nav-arrow:hover {
-            color: #007bff;
-        }
-        
-        .navigation {
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .navigation a {
-            margin: 0 10px;
-        }
-    </style>
+    <title>Financial Preparedness</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <h1>Data Visualizations</h1>
-    
+    <div style="margin-left: 50px;">
+        <h2>Financial Preparedness</h2>
+        <h3>Survey Responses Around The World: <i>How Difficult Would It Be to Raise Funds<sup>*</sup> For An
+                Emergency?</i></h3>
+    </div>
     <div class="container">
         <a href="https://ryguy96.github.io/DataVizFinal/p1" class="nav-arrow">‹</a>
-        
+
         <div class="content">
-            <h2>Page 2</h2>
-            <p>Content for page goes here.</p>
+            <div class="controls">
+                <div class="control-group">
+                    <strong>Timeframe To Raise Funds:</strong>
+                    <input type="radio" name="timeframe" value="30" checked> 30 Days
+                    <input type="radio" name="timeframe" value="7"> 7 Days  
+                </div>
+                <div class="control-group">
+                    <strong>Group By:</strong>
+                    <input type="radio" name="view" value="income" checked> Income Group
+                    <input type="radio" name="view" value="region"> Region
+                </div>
+            </div>
+
+            <div id="chart"></div>
+            <div class="tooltip" id="tooltip" style="opacity: 0;"></div>
         </div>
-        
-        <a href="https://ryguy96.github.io/DataVizFinal" class="nav-arrow">›</a>
+
+        <a href="https://ryguy96.github.io/DataVizFinal/p3" class="nav-arrow">›</a>
     </div>
+    <div style="margin-left: 200px;">
+        <p><sup>*</sup>Amount Of Funds = 1/20 Of The National Average Annual Income (GNI) For Region/Income-Group</p>
+    </div>
+
+
+    <script>
+        var regionData = [];
+        var incomeData = [];
+        var currentData = [];
+        var groupType = "income";
+        var timeWindow = "30";
+
+        var margin = { top: 40, right: 240, bottom: 150, left: 90 };
+        var chartWidth = 800;
+        var chartHeight = 500;
+
+        var svg = d3.select("#chart").append("svg");
+        var chartArea = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var colorScale = d3.scaleOrdinal()
+            .domain(["impossible", "veryDifficult", "difficult", "easy"])
+            .range(["#dc3545", "#ffc107", "#90EE90", "#28a745"]);
+
+        var xScale = d3.scaleBand().padding(0.2);
+        var yScale = d3.scaleLinear();
+
+        var tooltip = d3.select("#tooltip");
+
+        function buildCurrentData() {
+            var datasetToUse = groupType === "region" ? regionData : incomeData;
+            var processed = [];
+
+            for (var i = 0; i < datasetToUse.length; i++) {
+                var row = datasetToUse[i];
+                var groupName = row["Income Group"] || row["Country name"];
+                var prefix = timeWindow + " Days";
+
+                if (!groupName) continue;
+
+                processed.push({
+                    name: groupName,
+                    impossible: Math.round(parseFloat(row[prefix + " Not Possible"] || 0) * 100),
+                    veryDifficult: Math.round(parseFloat(row[prefix + " Very Difficult"] || 0) * 100),
+                    difficult: Math.round(parseFloat(row[prefix + " Somewhat Difficult"] || 0) * 100),
+                    easy: Math.round(parseFloat(row[prefix + " Not Difficult"] || 0) * 100)
+                });
+            }
+
+            currentData = processed;
+        }
+
+        function drawChart() {
+            if (currentData.length === 0) return;
+
+            var width = chartWidth;
+            svg.attr("width", width + margin.left + margin.right)
+                .attr("height", chartHeight + margin.top + margin.bottom);
+
+            xScale.domain(currentData.map(function (d) { return d.name; }))
+                .range([0, width]);
+
+            yScale.domain([0, 100])
+                .range([chartHeight, 0]);
+
+            chartArea.selectAll("*").remove();
+
+            for (var i = 0; i < currentData.length;  i++) {
+                var item = currentData[i];
+                var xPos = xScale(item.name); 
+                var barWidth = xScale.bandwidth();
+                var yStart = 0;
+
+                var keys = ["impossible", "veryDifficult", "difficult", "easy"];
+                for (var j = 0; j < keys.length; j++) {
+                    var key = keys[j];
+                    var value = item[key];
+                    var yEnd = yStart + value;
+
+                    chartArea.append("rect")
+                        .attr("x", xPos)
+                        .attr("y", yScale(yEnd))
+                        .attr("width", barWidth)
+                        .attr("height", yScale(yStart) - yScale(yEnd))
+                        .attr("fill", colorScale(key))
+                        .on("mouseover", (function (dName, v, k) {
+                            return function (event) {
+                                tooltip.style("opacity", 1)
+                                    .html("<strong>" + dName + "</strong><br/>" + k + ": " + v + "% in " + timeWindow + " days")
+                                    .style("left", (event.pageX + 8) + "px")
+                                    .style("top", (event.pageY - 10) + "px");
+                            };
+                        })(item.name, value, key))
+                        .on("mouseout", function () {
+                            tooltip.style("opacity", 0);
+                        });
+
+                    yStart = yEnd;
+                }
+            }
+
+            chartArea.append("g")
+                .attr("transform", "translate(0," + chartHeight + ")")
+                .call(d3.axisBottom(xScale))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)")
+                .style("font-size", "16px");
+
+            chartArea.append("g")
+                .call(d3.axisLeft(yScale).tickFormat(function (d) { return d + "%"; }))
+                .style("font-size", "16px");
+
+            chartArea.append("text")
+                .attr("transform", "translate(" + (width / 2) + "," + (chartHeight + margin.bottom - 10) + ")")
+                .style("text-anchor", "middle")
+                .style("font-size", "16px")
+                .text(groupType === "income" ? "Income Group" : "Region");
+
+            chartArea.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -chartHeight / 2)
+                .attr("y", -margin.left + 20)
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-size", "16px")
+                .text("% Who Can Raise Funds");
+
+            var legend = chartArea.append("g")
+                .attr("transform", "translate(" + (width + 20) + ",20)");
+
+            var legendLabels = ["impossible", "veryDifficult", "difficult", "easy"];
+            var displayNames = {
+                impossible: "Cannot Raise",
+                veryDifficult: "Very Difficult",
+                difficult: "Somewhat Difficult",
+                easy: "Not Difficult"
+            };
+
+            legend.append("text")
+                .attr("x", 0)
+                .attr("y", -10)
+                .text("Difficulty Level To Raise Funds");
+
+            for (var l = 0; l < legendLabels.length; l++) {
+                var label = legendLabels[l];
+                var legendRow = legend.append("g").attr("transform", "translate(0," + (l * 25) + ")");
+                legendRow.append("rect")
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .attr("fill", colorScale(label));
+                legendRow.append("text")
+                    .attr("x", 25)
+                    .attr("y", 14)
+                    .style("font-size", "16px")
+                    .text(displayNames[label]);
+            }
+            // TODO wider
+            if (groupType === "income") {
+                chartArea.append("text")
+                    .attr("x", width / 2)
+                    .attr("y", -30)
+                    .style("text-anchor", "middle")
+                    .style("font-size", "14px")
+                    .style("font-weight", "bold")
+                    .text("Generally, the richer the country, the more people can raise funds.");
+            }
+        }
+
+        Promise.all([
+            d3.json("EmergencyFundByRegion.json"),
+            d3.json("EmergencyFundByIncome.json")
+        ]).then(function (files) {
+            regionData = files[0];
+            incomeData = files[1];
+            buildCurrentData()
+            drawChart();
+        });
+
+        d3.selectAll("input[name='view']").on("change", function () {
+            groupType = this.value;
+            buildCurrentData();
+            drawChart();
+            formateChart()
+        });
+
+        d3.selectAll("input[name='timeframe']").on("change", function () {
+            timeWindow = this.value;
+            buildCurrentData();
+            drawChart()
+        });
+    </script>
+
 </body>
+
 </html>

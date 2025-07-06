@@ -1,0 +1,65 @@
+[
+  {
+    "name": "World",
+    "demographics": {
+      "female": { "veryWorried": 48, "somewhatWorried": 29, "notWorried": 23 },
+      "male": { "veryWorried": 43, "somewhatWorried": 30, "notWorried": 27 },
+      "young": { "veryWorried": 45, "somewhatWorried": 30, "notWorried": 25 },
+      "older": { "veryWorried": 46, "somewhatWorried": 29, "notWorried": 25 }
+    }
+  },
+  {
+    "name": "East Asia & Pacific", 
+    "demographics": {
+      "female": { "veryWorried": 36, "somewhatWorried": 38, "notWorried": 26 },
+      "male": { "veryWorried": 35, "somewhatWorried": 36, "notWorried": 29 },
+      "young": { "veryWorried": 33, "somewhatWorried": 39, "notWorried": 28 },
+      "older": { "veryWorried": 36, "somewhatWorried": 36, "notWorried": 28 }
+    }
+  },
+  {
+    "name": "Europe & Central Asia",
+    "demographics": {
+      "female": { "veryWorried": 33, "somewhatWorried": 32, "notWorried": 35 },
+      "male": { "veryWorried": 25, "somewhatWorried": 32, "notWorried": 43 },
+      "young": { "veryWorried": 23, "somewhatWorried": 34, "notWorried": 43 },
+      "older": { "veryWorried": 30, "somewhatWorried": 32, "notWorried": 38 }
+    }
+  },
+  {
+    "name": "South Asia",
+    "demographics": {
+      "female": { "veryWorried": 70, "somewhatWorried": 18, "notWorried": 12 },
+      "male": { "veryWorried": 60, "somewhatWorried": 23, "notWorried": 17 },
+      "young": { "veryWorried": 56, "somewhatWorried": 25, "notWorried": 19 },
+      "older": { "veryWorried": 68, "somewhatWorried": 19, "notWorried": 13 }
+    }
+  },
+  {
+    "name": "Latin America & Caribbean",
+    "demographics": {
+      "female": { "veryWorried": 60, "somewhatWorried": 24, "notWorried": 16 },
+      "male": { "veryWorried": 50, "somewhatWorried": 30, "notWorried": 20 },
+      "young": { "veryWorried": 51, "somewhatWorried": 34, "notWorried": 15 },
+      "older": { "veryWorried": 56, "somewhatWorried": 25, "notWorried": 19 }
+    }
+  },
+  {
+    "name": "North America",
+    "demographics": {
+      "female": { "veryWorried": 25, "somewhatWorried": 29, "notWorried": 46 },
+      "male": { "veryWorried": 22, "somewhatWorried": 31, "notWorried": 47 },
+      "young": { "veryWorried": 23, "somewhatWorried": 30, "notWorried": 47 },
+      "older": { "veryWorried": 24, "somewhatWorried": 30, "notWorried": 46 }
+    }
+  },
+  {
+    "name": "Sub-Saharan Africa", 
+    "demographics": {
+      "female": { "veryWorried": 66, "somewhatWorried": 21, "notWorried": 13 },
+      "male": { "veryWorried": 62, "somewhatWorried": 23, "notWorried": 15 },
+      "young": { "veryWorried": 61, "somewhatWorried": 23, "notWorried": 16 },
+      "older": { "veryWorried": 66, "somewhatWorried": 21, "notWorried": 13 }
+    }
+  }
+]

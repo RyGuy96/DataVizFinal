@@ -1,0 +1,132 @@
+[
+  {
+    "name": "Low income",
+    "code": "LIC",
+    "demographics": {
+      "female": {
+        "veryWorried": 73,
+        "notWorried": 8,
+        "somewhatWorried": 19
+      },
+      "male": {
+        "veryWorried": 72,
+        "notWorried": 9,
+        "somewhatWorried": 19
+      },
+      "young": {
+        "veryWorried": 68,
+        "notWorried": 10,
+        "somewhatWorried": 22
+      },
+      "older": {
+        "veryWorried": 75,
+        "notWorried": 7,
+        "somewhatWorried": 18
+      }
+    }
+  },
+  {
+    "name": "High income",
+    "code": "HIC",
+    "demographics": {
+      "female": {
+        "veryWorried": 22,
+        "notWorried": 43,
+        "somewhatWorried": 35
+      },
+      "male": {
+        "veryWorried": 18,
+        "notWorried": 48,
+        "somewhatWorried": 34
+      },
+      "young": {
+        "veryWorried": 19,
+        "notWorried": 47,
+        "somewhatWorried": 34
+      },
+      "older": {
+        "veryWorried": 21,
+        "notWorried": 45,
+        "somewhatWorried": 34
+      }
+    }
+  },
+  {
+    "name": "Upper middle income",
+    "code": "UMC",
+    "demographics": {
+      "female": {
+        "veryWorried": 39,
+        "notWorried": 26,
+        "somewhatWorried": 35
+      },
+      "male": {
+        "veryWorried": 38,
+        "notWorried": 29,
+        "somewhatWorried": 33
+      },
+      "young": {
+        "veryWorried": 33,
+        "notWorried": 29,
+        "somewhatWorried": 38
+      },
+      "older": {
+        "veryWorried": 39,
+        "notWorried": 27,
+        "somewhatWorried": 34
+      }
+    }
+  },
+  {
+    "name": "Middle income",
+    "code": "MIC",
+    "demographics": {
+      "female": {
+        "veryWorried": 54,
+        "notWorried": 19,
+        "somewhatWorried": 27
+      },
+      "male": {
+        "veryWorried": 48,
+        "notWorried": 22,
+        "somewhatWorried": 30
+      },
+      "young": {
+        "veryWorried": 47,
+        "notWorried": 22,
+        "somewhatWorried": 31
+      },
+      "older": {
+        "veryWorried": 52,
+        "notWorried": 20,
+        "somewhatWorried": 28
+      }
+    }
+  },
+  {
+    "name": "Lower middle income",
+    "code": "LMC",
+    "demographics": {
+      "female": {
+        "veryWorried": 66,
+        "notWorried": 13,
+        "somewhatWorried": 21
+      },
+      "male": {
+        "veryWorried": 57,
+        "notWorried": 17,
+        "somewhatWorried": 26
+      },
+      "young": {
+        "veryWorried": 55,
+        "notWorried": 19,
+        "somewhatWorried": 26
+      },
+      "older": {
+        "veryWorried": 64,
+        "notWorried": 13,
+        "somewhatWorried": 23
+      }
+    }
+  }
+]

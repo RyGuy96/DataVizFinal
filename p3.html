@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Worry Levels</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div style="margin-left: 50px;">
+        <h2>Very Worried vs Not Worried</h2>
+        <h3>Survey Responses Around The World: <i>How Financially Worried Are You?</i><sup>*</sup></h3>
+    </div>
+
+    <div class="container">
+        <a href="https://ryguy96.github.io/DataVizFinal/p2" class="nav-arrow">‹</a>
+
+        <div class="content">
+            <div>
+                Group By:
+                <input type="radio" name="view" value="income" checked> Income Group
+                <input type="radio" name="view" value="region"> Region
+                <br><br>
+                Select Group:
+                <select id="groupSelector">
+                    <option value="0">High income</option>
+                </select>
+            </div>
+
+            <div id="chart"></div>
+            <div class="tooltip" id="tooltip" style="opacity: 0;"></div>
+        </div>
+
+        <a href="https://ryguy96.github.io/DataVizFinal" class="nav-arrow">›</a>
+    </div>
+    <div style="margin-left: 200px;">
+        <p><sup>*</sup>Values are the average of multiple worry-related metrics, e.g. "How worried are you about having
+            the funds to pay school fees?"</p>
+    </div>
+
+    <script>
+        let regionData = [], incomeData = []
+        let currentGroupBy = "income"
+        let groupIndex = 0
+        let grouper = 3;
+        const MARGIN = { top: 40, right: 200, bottom: 80, left: 120 }
+        let chartW = 800
+        let chartH = 580
+        let padding = 9
+
+        let svg = d3.select("#chart").append("svg")
+            .attr("width", chartW + MARGIN.left + MARGIN.right)
+            .attr("height", chartH + MARGIN.top + MARGIN.bottom)
+
+        let g = svg.append("g").attr("transform", `translate(${MARGIN.left},${MARGIN.top})`)
+
+        let color = d3.scaleOrdinal().domain(["veryWorried", "notWorried"]).range(["#e74c3c", "#27ae60"])
+
+        let x = d3.scaleLinear().range([0, chartW]).domain([0, 100])
+        let y = d3.scaleBand().range([chartH, 0]).padding(.3)
+
+        let tooltip = d3.select("#tooltip")
+
+        function getData() {
+            let d = currentGroupBy === "region" ? regionData : incomeData
+            if (currentGroupBy === "income") {
+                d = d.filter(x => x.name === "High income" || x.name === "Low income")
+            }
+            return d[groupIndex] || d[0]
+        }
+
+        function populateSelector() {
+            let source = currentGroupBy === "region" ? regionData : incomeData
+            if (currentGroupBy === "income") {
+                source = source.filter(x => x.name === "High income" || x.name === "Low income")
+            }
+            let sel = d3.select("#groupSelector")
+            sel.selectAll("option").remove()
+            source.forEach(function (row, i) {
+                sel.append("option").attr("value", i).text(row.name)
+            })
+            sel.property("value", groupIndex)
+        }
+
+        function prepareBarData() {
+            let d = getData()
+            if (!d || !d.demographics) return [];
+
+            let list = []
+            list.push({ name: "Female", veryWorried: d.demographics.female.veryWorried, notWorried: d.demographics.female.notWorried })
+            list.push({ name: "Male", veryWorried: d.demographics.male.veryWorried, notWorried: d.demographics.male.notWorried })
+            list.push({ name: "Young", veryWorried: d.demographics.young.veryWorried, notWorried: d.demographics.young.notWorried })
+            list.push({ name: "Older", veryWorried: d.demographics.older.veryWorried, notWorried: d.demographics.older.notWorried })
+            return list;
+        }
+
+        function drawChart() {
+
+            let dataToPlot = prepareBarData()
+
+            y.domain(dataToPlot.map(r => r.name))
+            g.selectAll("*").remove()
+
+            dataToPlot.forEach(function (row) {
+                let yPos = y(row.name)
+                let vW = row.veryWorried
+                let nW = row.notWorried
+                let barH = y.bandwidth()
+
+                g.append("rect").attr("x", 0).attr("y", yPos)
+                    .attr("width", x(vW)).attr("height", barH)
+                    .attr("fill", color("veryWorried"))
+                    .on("mouseover", function (evt) {
+                        tooltip.style("opacity", 1)
+                            .html(`<strong>${row.name}</strong><br/>Very Worried: ${vW}%`)
+                            .style("left", (evt.pageX + 8) + "px").style("top", (evt.pageY - 12) + "px")
+                    })
+                    .on("mouseout", () => tooltip.style("opacity", 0))
+
+                g.append("rect").attr("x", x(vW)).attr("y", yPos)
+                    .attr("width", x(nW)).attr("height", barH)
+                    .attr("fill", color("notWorried"))
+                    .on("mouseover", function (evt) {
+                        tooltip.style("opacity", 1)
+                            .html(`<strong>${row.name}</strong><br/>Not Worried: ${nW}%`)
+                            .style("left", (evt.pageX + 8) + "px").style("top", (evt.pageY - 12) + "px")
+                    })
+                    .on("mouseout", () => tooltip.style("opacity", 0))
+            })
+
+            g.append("g").attr("transform", "translate(0," + chartH + ")").call(d3.axisBottom(x).tickFormat(function (d) { return d + "%" })).style("font-size", "15px")
+            g.append("g").call(d3.axisLeft(y)).style("font-size", "15px")
+
+            g.append("text").attr("transform", `translate(${chartW / 2},${chartH + 50})`).style("text-anchor", "middle").text("Percent of People")
+
+            if (getData().name === "High income") {
+                g.append("text").attr("x", chartW / 2).attr("y", -10).style("text-anchor", "middle").text("Even in rich areas, some are still very worried")
+            }
+        }
+
+        Promise.all([
+            d3.json("WorryByRegionDemographic.json"),
+            d3.json("WorryByRegionIncome.json")
+        ]).then(function ([region, income]) {
+            regionData = region;
+            incomeData = income;
+            populateSelector()
+            drawChart()
+        })
+
+        d3.selectAll("input[name='view']").on("change", function () {
+            currentGroupBy = this.value
+            groupIndex = 0
+            populateSelector()
+            drawChart()
+            formateChart()
+        })
+
+        d3.select("#groupSelector").on("change", function () {
+            groupIndex = +this.value
+            drawChart()
+        })
+    </script>
+</body>
+
+</html>

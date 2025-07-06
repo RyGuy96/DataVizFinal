@@ -1,0 +1,72 @@
+[
+    {
+      "Income Group":"High income",
+      "Country code":"HIC",
+      "Year":2021,
+      "Adult populaiton":1016635456,
+      "Region":"",
+      "Income group":"High income",
+      "Old Age":0.31,
+      "Medical Costs":0.23,
+      "Bills":0.13,
+      "Education Expenses":0.06,
+      "Sum":0.73,
+      "Other":0.27
+    },
+    {
+      "Income Group":"Upper middle income",
+      "Country code":"UMC",
+      "Year":2021,
+      "Adult populaiton":2008144896,
+      "Region":"",
+      "Income group":"Upper middle income",
+      "Old Age":0.16,
+      "Medical Costs":0.4,
+      "Bills":0.12,
+      "Education Expenses":0.09,
+      "Sum":0.77,
+      "Other":0.23
+    },
+    {
+      "Income Group":"Middle income",
+      "Country code":"MIC",
+      "Year":2021,
+      "Adult populaiton":4351686656,
+      "Region":"",
+      "Income group":"",
+      "Old Age":0.18,
+      "Medical Costs":0.36,
+      "Bills":0.15,
+      "Education Expenses":0.14,
+      "Sum":0.83,
+      "Other":0.17
+    },
+    {
+      "Income Group":"Lower middle income",
+      "Country code":"LMC",
+      "Year":2021,
+      "Adult populaiton":2343649024,
+      "Region":"",
+      "Income group":"Lower middle income",
+      "Old Age":0.2,
+      "Medical Costs":0.32,
+      "Bills":0.18,
+      "Education Expenses":0.19,
+      "Sum":0.89,
+      "Other":0.11
+    },
+    {
+      "Income Group":"Low income",
+      "Country code":"LIC",
+      "Year":2021,
+      "Adult populaiton":387653984,
+      "Region":"",
+      "Income group":"Low income",
+      "Old Age":0.15,
+      "Medical Costs":0.38,
+      "Bills":0.14,
+      "Education Expenses":0.27,
+      "Sum":0.94,
+      "Other":0.06
+    }
+  ]

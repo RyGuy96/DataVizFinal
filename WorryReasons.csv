@@ -1,0 +1,6 @@
+﻿Income Group,Country code,Year,Adult populaiton,Region,Income group,Most worrying financial issue: money for old age (% age 15+),Most worrying financial issue: paying for medical costs in case of a serious illness or accident (% age 15+),Most worrying financial issue: money to pay for monthly expenses or bills (% age 15+),Most worrying financial issue: paying school or education fees (% age 15+),Sum,Other
+High income,HIC,2021,1016635456,,High income,0.31,0.23,0.13,0.06,0.73,0.27
+Upper middle income,UMC,2021,2008144896,,Upper middle income,0.16,0.4,0.12,0.09,0.77,0.23
+Middle income,MIC,2021,4351686656,,,0.18,0.36,0.15,0.14,0.83,0.17
+Low income,LIC,2021,387653984,,Low income,0.15,0.38,0.14,0.27,0.94,0.06
+Lower middle income,LMC,2021,2343649024,,Lower middle income,0.2,0.32,0.18,0.19,0.89,0.11
